@@ -58,6 +58,19 @@ namespace MagicVilla_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Villas");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Amenity = "haha",
+                            CreatedDate = new DateTime(2024, 12, 11, 18, 23, 56, 109, DateTimeKind.Local).AddTicks(8014),
+                            Description = "very good ya handasa",
+                            ImageUrl = "test",
+                            Name = "Royal villa",
+                            Occupancy = 4,
+                            Rate = 100.0
+                        });
                 });
 #pragma warning restore 612, 618
         }

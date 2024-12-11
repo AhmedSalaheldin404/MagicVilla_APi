@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MagicVilla_API.Migrations
 {
     /// <inheritdoc />
-    public partial class addtable : Migration
+    public partial class test : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -29,6 +29,11 @@ namespace MagicVilla_API.Migrations
                 {
                     table.PrimaryKey("PK_Villas", x => x.Id);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Villas",
+                columns: new[] { "Id", "Amenity", "CreatedDate", "Description", "ImageUrl", "Name", "Occupancy", "Rate" },
+                values: new object[] { 1, "haha", new DateTime(2024, 12, 11, 18, 23, 56, 109, DateTimeKind.Local).AddTicks(8014), "very good ya handasa", "test", "Royal villa", 4, 100.0 });
         }
 
         /// <inheritdoc />
