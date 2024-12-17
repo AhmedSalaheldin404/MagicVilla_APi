@@ -161,7 +161,7 @@ namespace MagicVilla_API.Controllers
                 return BadRequest(ModelState);
 
             }
-             await s_dbvilla.Update(model);
+             await _dbvilla.Update(model);
             return NoContent();
         }
     }
