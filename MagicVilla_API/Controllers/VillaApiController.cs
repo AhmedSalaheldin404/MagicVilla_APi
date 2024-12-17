@@ -2,6 +2,7 @@
 using MagicVilla_API.Data;
 using MagicVilla_API.Models;
 using MagicVilla_API.Models.Dto;
+using MagicVilla_API.Repositry.IRepo;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
@@ -14,11 +15,12 @@ namespace MagicVilla_API.Controllers
     [ApiController]
     public class VillaApiController : ControllerBase
     {
-        private readonly ApplicationDbContext _db;
+        //private readonly ApplicationDbContext _db;
+        private readonly IVillaRepo _dbvilla;
         private readonly IMapper _mapper;
-        public VillaApiController(ApplicationDbContext db, IMapper mapper)
+        public VillaApiController(IVillaRepo dbvilla, IMapper mapper)
         {
-            _db = db;
+            _dbvilla = dbvilla;
             _mapper = mapper;
             
         }
@@ -27,7 +29,7 @@ namespace MagicVilla_API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<VillaDto>>> GetVillas()
         {
-            IEnumerable<Villa> villalist = await _db.Villas.ToListAsync();
+            IEnumerable<Villa> villalist = await _dbvilla.Getall();
             return Ok(_mapper.Map<List<VillaDto>>(villalist) );
         }
         //GET ONE VILLA BY ID
@@ -40,7 +42,7 @@ namespace MagicVilla_API.Controllers
 
             if (id == 0) { return BadRequest(); }
 
-            var villa =  await _db.Villas.FirstOrDefaultAsync(u => u.Id == id);
+            var villa =  await _dbvilla.Get(u => u.Id == id);
             if (villa == null)
             {
                 return NotFound();
@@ -68,8 +70,8 @@ namespace MagicVilla_API.Controllers
             //Occupancy= Createdto.Occupancy
             //};
 
-          await  _db.Villas.AddAsync(model);
-           await _db.SaveChangesAsync();
+          await _dbvilla.create(model);
+           
             return CreatedAtRoute("GetVilla", new { id = Createdto.Id }, Createdto);
         }
         [HttpDelete("{id:int}", Name = "DeleteVilla")]
@@ -79,13 +81,13 @@ namespace MagicVilla_API.Controllers
         public async Task<IActionResult> DeleteAVilla(int id) {
             if (id == 0) { return BadRequest(); }
 
-            var villa = await _db.Villas.FirstOrDefaultAsync(u => u.Id == id);
+            var villa = await _dbvilla.Get(u => u.Id == id);
             if (villa == null)
             {
                 return NotFound();
             }
-           _db.Remove(villa);
-          await  _db.SaveChangesAsync();
+            _dbvilla.Remove(villa);
+         
             return NoContent();
 
         }
@@ -113,8 +115,8 @@ namespace MagicVilla_API.Controllers
             //    ImageUrl = villa.ImageUrl,
             //    Occupancy = villa.Occupancy
             //}; 
-            _db.Villas.Update(model);
-            await _db.SaveChangesAsync();
+            _dbvilla.Update(model);
+           
             return NoContent();
         }
         [HttpPatch("{id:int}", Name = "UpdateAVilla")]
@@ -124,7 +126,7 @@ namespace MagicVilla_API.Controllers
         public async Task<IActionResult> UpdateAVilla(int id, JsonPatchDocument<VillaDto>patchdto)
         {
             if(patchdto==null ||id==0) { return BadRequest(); }
-            var villa=await _db.Villas.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+            var villa = await _dbvilla.Get(u => u.Id == id, tracked: false);
 
             VillaDto villadto=_mapper.Map<VillaDto>(patchdto);
             //VillaDto villadto = new()
@@ -159,8 +161,7 @@ namespace MagicVilla_API.Controllers
                 return BadRequest(ModelState);
 
             }
-            _db.Villas.Update(model);
-           await _db.SaveChangesAsync();
+             await s_dbvilla.Update(model);
             return NoContent();
         }
     }
